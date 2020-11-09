@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+  }
+  
+  h1{
+    color:#fff;
+  }
+  .container {
+    background-color: #333;
+    padding: 1rem;
+    margin: 1rem;
+    width: 200px;
+  }
+  
+  .draggable {
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid black;
+    cursor: move;
+  }
+  
+  .draggable.dragging {
+    opacity: .5;
+  }
+  
+#main-container{
+    display: flex;
+}
+
+  input{
+      display: block;
+      width:83%;
+      height: 0px;
+  }
+
+  .main{
+      display: flex;
+  }
