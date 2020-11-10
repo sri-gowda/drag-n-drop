@@ -32,7 +32,10 @@ let addsec = document.getElementById('addsection');
                     elementToInsert.setAttribute('draggable',true);
                     elementToInsert.setAttribute('placeholder','Text');
                     elementToInsert.setAttribute('disabled',true);
-                    
+                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                    elementToInsert.addEventListener('dragstart',function(ev){
+                        ev.dataTransfer.setData('elementid',ev.target.id);
+                    });
                     break;
                 case 'email-field':
                         elementToInsert = document.createElement('input');
@@ -41,6 +44,10 @@ let addsec = document.getElementById('addsection');
                         elementToInsert.setAttribute('draggable',true);
                         elementToInsert.setAttribute('placeholder','Email');
                         elementToInsert.setAttribute('disabled',true);
+                        elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                        elementToInsert.addEventListener('dragstart',function(ev){
+                            ev.dataTransfer.setData('elementid',ev.target.id);
+                        });
                         break;
                 case 'phone-field':
                     elementToInsert = document.createElement('input');
@@ -49,6 +56,10 @@ let addsec = document.getElementById('addsection');
                     elementToInsert.setAttribute('draggable',true);
                     elementToInsert.setAttribute('placeholder','Phone');
                     elementToInsert.setAttribute('disabled',true);
+                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                    elementToInsert.addEventListener('dragstart',function(ev){
+                        ev.dataTransfer.setData('elementid',ev.target.id);
+                    });
                     break;
                 default:
                     elementToInsert = draggable;
@@ -57,24 +68,21 @@ let addsec = document.getElementById('addsection');
         }else{
             elementToInsert = draggable; 
         }
-
-        elementToInsert.addEventListener('dragstart',function(ev){
-            ev.dataTransfer.setData('elementid',ev.target.id);
-        })
-        elementToInsert.setAttribute('id',`field-${Date.now()}`);
+      
         draggable.classList.add('dragging')
         })
     
         draggable.addEventListener('dragend', () => {
-            draggable.classList.remove('dragging')
+            draggable.classList.remove('dragging');
+            console.log("on drag end");
         })
     })
 
    
     function init(){
-        draggables = document.querySelectorAll('.draggable');
+     
         containers = document.querySelectorAll('.container');
-        console.log("draggables",draggables,containers);
+        console.log("draggables",containers);
         
         containers.forEach(container => {
             container.addEventListener('dragover', e => {
@@ -92,8 +100,9 @@ let addsec = document.getElementById('addsection');
             container.addEventListener('drop', e => {
                 e.preventDefault()
                 let data = e.dataTransfer.getData("elementid");
-                // console.log("ff",data);
-                draggables = document.querySelectorAll('.draggable');
+                console.log("ff",data);
+               
+                // draggables = document.querySelectorAll('.draggable');
                 // init();
             })
             container.addEventListener('dragleave', e => {
