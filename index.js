@@ -22,53 +22,56 @@ let addsec = document.getElementById('addsection');
             e.stopPropagation();
           
         console.log("drag start",e,draggable);
-        if(draggable && draggable.getAttribute('name')){
-            let element = draggable.getAttribute('name');
-            switch(element){
-                case 'text-field':
-                    elementToInsert = document.createElement('input');
+        e.dataTransfer.setData('elementid',e.target.id);
+        // if(draggable && draggable.getAttribute('name')){
+        //     let element = draggable.getAttribute('name');
+        //     switch(element){
+        //         case 'text-field':
+        //             elementToInsert = document.createElement('input');
                     
-                    elementToInsert.classList.add('draggable');
-                    elementToInsert.setAttribute('draggable',true);
-                    elementToInsert.setAttribute('placeholder','Text');
-                    elementToInsert.setAttribute('disabled',true);
-                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
-                    elementToInsert.addEventListener('dragstart',function(ev){
-                        ev.dataTransfer.setData('elementid',ev.target.id);
-                    });
-                    break;
-                case 'email-field':
-                        elementToInsert = document.createElement('input');
+        //             elementToInsert.classList.add('draggable');
+        //             elementToInsert.setAttribute('draggable',true);
+        //             elementToInsert.setAttribute('placeholder','Text');
+        //             elementToInsert.setAttribute('disabled',true);
+        //             elementToInsert.setAttribute('id',`field-${Date.now()}`);
+        //             elementToInsert.addEventListener('dragstart',function(ev){
+        //                 ev.dataTransfer.setData('elementid',ev.target.id);
+        //             });
+        //             break;
+        //         case 'email-field':
+        //                 elementToInsert = document.createElement('input');
                         
-                        elementToInsert.classList.add('draggable');
-                        elementToInsert.setAttribute('draggable',true);
-                        elementToInsert.setAttribute('placeholder','Email');
-                        elementToInsert.setAttribute('disabled',true);
-                        elementToInsert.setAttribute('id',`field-${Date.now()}`);
-                        elementToInsert.addEventListener('dragstart',function(ev){
-                            ev.dataTransfer.setData('elementid',ev.target.id);
-                        });
-                        break;
-                case 'phone-field':
-                    elementToInsert = document.createElement('input');
+        //                 elementToInsert.classList.add('draggable');
+        //                 elementToInsert.setAttribute('draggable',true);
+        //                 elementToInsert.setAttribute('placeholder','Email');
+        //                 elementToInsert.setAttribute('disabled',true);
+        //                 elementToInsert.setAttribute('id',`field-${Date.now()}`);
+        //                 elementToInsert.addEventListener('dragstart',function(ev){
+        //                     ev.dataTransfer.setData('elementid',ev.target.id);
+        //                 });
+        //                 break;
+        //         case 'phone-field':
+        //             elementToInsert = document.createElement('input');
                     
-                    elementToInsert.classList.add('draggable');
-                    elementToInsert.setAttribute('draggable',true);
-                    elementToInsert.setAttribute('placeholder','Phone');
-                    elementToInsert.setAttribute('disabled',true);
-                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
-                    elementToInsert.addEventListener('dragstart',function(ev){
-                        ev.dataTransfer.setData('elementid',ev.target.id);
-                    });
-                    break;
-                default:
-                    elementToInsert = draggable;
-                    break;
-            }
-        }else{
-            elementToInsert = draggable; 
-        }
-      
+        //             elementToInsert.classList.add('draggable');
+        //             elementToInsert.setAttribute('draggable',true);
+        //             elementToInsert.setAttribute('placeholder','Phone');
+        //             elementToInsert.setAttribute('disabled',true);
+        //             elementToInsert.setAttribute('id',`field-${Date.now()}`);
+        //             elementToInsert.addEventListener('dragstart',function(ev){
+        //                 ev.dataTransfer.setData('elementid',ev.target.id);
+        //             });
+        //             break;
+        //         default:
+        //             elementToInsert = draggable;
+        //             break;
+        //     }
+        // }else{
+        //     elementToInsert = draggable; 
+        // }
+
+       
+        elementToInsert = draggable;
         draggable.classList.add('dragging')
         })
     
@@ -87,23 +90,21 @@ let addsec = document.getElementById('addsection');
         containers.forEach(container => {
             container.addEventListener('dragover', e => {
                 e.preventDefault()
-                let data = e.dataTransfer.getData("elementid");
-                console.log("eee",data);
                 afterElement = getDragAfterElement(container, e.clientY);
                 if (afterElement == null) {
                 
                 container.appendChild(elementToInsert)
                 } else {
+                elementToInsert.style.opacity = 0.5;
                 container.insertBefore(elementToInsert, afterElement)
                 }
             })
             container.addEventListener('drop', e => {
                 e.preventDefault()
+                elementToInsert.style.opacity = 1;
                 let data = e.dataTransfer.getData("elementid");
                 console.log("ff",data);
                
-                // draggables = document.querySelectorAll('.draggable');
-                // init();
             })
             container.addEventListener('dragleave', e => {
                 e.preventDefault();
