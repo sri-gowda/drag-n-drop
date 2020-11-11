@@ -30,9 +30,9 @@ function CustomDragAndDrop(){
         if(name === 'containers' && this.containers){
             this.containers.forEach(container => {
                 container.addEventListener('dragover',e => this.onDragHover(e,container,false));
-                container.addEventListener('drop',e => this.onDragDrop(e),false);
-                container.addEventListener('dragleave',e => this.onDragLeave(e),false);
-                container.addEventListener('dragenter',e => this.onDragEnter(e),false);
+                container.addEventListener('drop',e => this.onDragDrop(e,container),false);
+                container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+                container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
             });
         }else if('draggables' && this.draggables){
             this.draggables.forEach(draggable => {
@@ -42,9 +42,9 @@ function CustomDragAndDrop(){
         }else if(this.draggables && this.containers){
             this.containers.forEach(container => {
                 container.addEventListener('dragover',e => this.onDragHover(e,container),false);
-                container.addEventListener('drop', e => this.onDragDrop(e),false);
-                container.addEventListener('dragleave',e => this.onDragLeave(e),false);
-                container.addEventListener('dragenter',e => this.onDragEnter(e),false);
+                container.addEventListener('drop', e => this.onDragDrop(e,container),false);
+                container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+                container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
             });
             this.draggables.forEach(draggable => {
                 draggable.addEventListener('dragstart',e => this.onDragStart(e),false);
@@ -155,13 +155,18 @@ function CustomDragAndDrop(){
     }
     this.onDragEnd = function(e,draggable){
         draggable.classList.remove('dragging');
-        console.log("drag end",this.elementToInsert);
+        console.log("drag end",this.elementToInsert.id);
         if(!this.existingElement){
             this.addEventListenerForDraggableItem(this.elementToInsert);
             this.updateDraggables('draggables');
         }else{
             console.log("existing ele",this.elementToInsert);
             this.elementToInsert.classList.remove('dragging');
+        }
+        console.log("placeholder",this.placeholder);
+        let placeholderEl = document.getElementById(this.placeholder.id);
+        if(placeholderEl != null){
+            placeholderEl.parentElement.removeChild(placeholderEl);
         }
     }
     this.addEventListenerForDraggableItem = function(element){
@@ -172,27 +177,39 @@ function CustomDragAndDrop(){
 
     this.addEventListenersForContainer = function(container){
         container.addEventListener('dragover',e => this.onDragHover(e,container,false));
-        container.addEventListener('drop',e => this.onDragDrop(e),false);
-        container.addEventListener('dragleave',e => this.onDragLeave(e),false);
-        container.addEventListener('dragenter',e => this.onDragEnter(e),false);
+        container.addEventListener('drop',e => this.onDragDrop(e,container),false);
+        container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+        container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
     }
 
     this.onDragHover = function(e,container){
         e.preventDefault();
+        // this.afterElement = this.getDragAfterElement(container, e.clientY);
+        // if (this.afterElement == null) {
+        //     container.appendChild(this.placeholder)
+        // } else {
+        //     container.insertBefore(this.placeholder, this.afterElement)
+        // }
+    }
+    this.onDragEnter = function(e,container){
+        e.preventDefault();
+        console.log("on drag enter");
         this.afterElement = this.getDragAfterElement(container, e.clientY);
+        let ele = document.getElementById(this.elementToInsert.id);
+        if(ele){
+            ele.parentElement.removeChild(ele);
+        }
         if (this.afterElement == null) {
             container.appendChild(this.placeholder)
         } else {
             container.insertBefore(this.placeholder, this.afterElement)
         }
-    }
-    this.onDragEnter = function(e){
-        e.preventDefault();
+
     }
     this.onDragLeave = function(e){
         e.preventDefault();
-        console.log("on drag leave");
     }
+    
     this.onDragDrop = function(e){
         e.preventDefault()
         // let data = e.dataTransfer.getData("elementid");
