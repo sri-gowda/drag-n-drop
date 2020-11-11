@@ -1,115 +1,95 @@
-let draggables = document.querySelectorAll('.draggable');
-let containers = document.querySelectorAll('.container');
-let mainContainer = document.getElementById('main-container');
-let afterElement;
-let elementToInsert;
-let count = 0;
+function CustomDragAndDrop(){
+    this.draggables = undefined;
+    this.containers = undefined;
+    this.placeholder = undefined;
+    this.elementToInsert = undefined;
+    this.afterElement = undefined;
+    this.sectionCount = 0;
+    this.mainContainer = undefined;
+    this.existingElement = undefined;
 
-let addsec = document.getElementById('addsection');
-
-    addsec.addEventListener('click',function(e){
+    this.addSection = function(){
         let container = document.createElement('div');
             container.classList.add('container');
         let section = document.createElement('h1');
-            section.innerHTML = `Section ${count++}`;
+            section.innerHTML = `Section ${this.sectionCount++}`;
             container.appendChild(section);
-        mainContainer.appendChild(container)
-        init();
-    })
-
-    draggables.forEach(draggable => {
-        draggable.addEventListener('dragstart', (e) => {
-            e.stopPropagation();
-          
-        console.log("drag start",e,draggable);
-        if(draggable && draggable.getAttribute('name')){
-            let element = draggable.getAttribute('name');
-            switch(element){
-                case 'text-field':
-                    elementToInsert = document.createElement('input');
-                    
-                    elementToInsert.classList.add('draggable');
-                    elementToInsert.setAttribute('draggable',true);
-                    elementToInsert.setAttribute('placeholder','Text');
-                    elementToInsert.setAttribute('disabled',true);
-                    
-                    break;
-                case 'email-field':
-                        elementToInsert = document.createElement('input');
-                        
-                        elementToInsert.classList.add('draggable');
-                        elementToInsert.setAttribute('draggable',true);
-                        elementToInsert.setAttribute('placeholder','Email');
-                        elementToInsert.setAttribute('disabled',true);
-                        break;
-                case 'phone-field':
-                    elementToInsert = document.createElement('input');
-                    
-                    elementToInsert.classList.add('draggable');
-                    elementToInsert.setAttribute('draggable',true);
-                    elementToInsert.setAttribute('placeholder','Phone');
-                    elementToInsert.setAttribute('disabled',true);
-                    break;
-                default:
-                    elementToInsert = draggable;
-                    break;
-            }
-        }else{
-            elementToInsert = draggable; 
-        }
-
-        elementToInsert.addEventListener('dragstart',function(ev){
-            ev.dataTransfer.setData('elementid',ev.target.id);
-        })
-        elementToInsert.setAttribute('id',`field-${Date.now()}`);
-        draggable.classList.add('dragging')
-        })
-    
-        draggable.addEventListener('dragend', () => {
-            draggable.classList.remove('dragging')
-        })
-    })
-
-   
-    function init(){
-        draggables = document.querySelectorAll('.draggable');
-        containers = document.querySelectorAll('.container');
-        console.log("draggables",draggables,containers);
-        
-        containers.forEach(container => {
-            container.addEventListener('dragover', e => {
-                e.preventDefault()
-                let data = e.dataTransfer.getData("elementid");
-                console.log("eee",data);
-                afterElement = getDragAfterElement(container, e.clientY);
-                if (afterElement == null) {
-                
-                container.appendChild(elementToInsert)
-                } else {
-                container.insertBefore(elementToInsert, afterElement)
-                }
-            })
-            container.addEventListener('drop', e => {
-                e.preventDefault()
-                let data = e.dataTransfer.getData("elementid");
-                // console.log("ff",data);
-                draggables = document.querySelectorAll('.draggable');
-                // init();
-            })
-            container.addEventListener('dragleave', e => {
-                e.preventDefault();
-            })
-            container.addEventListener('dragenter', e => {
-                e.preventDefault();
-            })
-        })
-
-
+            console.log("this main container",this.mainContainer);
+        this.mainContainer.appendChild(container);
+        this.addEventListenersForContainer(container);
+        this.updateContainers();
     }
-
-    function getDragAfterElement(container, y) {
+    this.updateContainers = function(){
+        this.containers = document.querySelectorAll('.container');
+    }
+    this.updateDraggables = function(){
+        this.draggables = document.querySelectorAll('.draggable');
+    }
+    this.addEventListeners = function(name){
+        console.log("adding event listeners",this.containers,this.draggables);
+        if(name === 'containers' && this.containers){
+            this.containers.forEach(container => {
+                container.addEventListener('dragover',e => this.onDragHover(e,container,false));
+                container.addEventListener('drop',e => this.onDragDrop(e,container),false);
+                container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+                container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
+            });
+        }else if('draggables' && this.draggables){
+            this.draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart',e => this.onDragStart(e,draggable),false);
+                draggable.addEventListener('dragend', e => this.onDragEnd(e,draggable),false);
+            });
+        }else if(this.draggables && this.containers){
+            this.containers.forEach(container => {
+                container.addEventListener('dragover',e => this.onDragHover(e,container),false);
+                container.addEventListener('drop', e => this.onDragDrop(e,container),false);
+                container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+                container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
+            });
+            this.draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart',e => this.onDragStart(e),false);
+                draggable.addEventListener('dragend', e => this.onDragEnd(e),false);
+            });
+        }
+        console.log("draggables",this.draggables);
+        console.log("this.containers",this.containers);
+    }
+    this.removeEventListeners = function(name){
+        if(name === 'container' && this.containers){
+            this.containers.forEach(container => {
+                container.removeEventListener('dragover',e => this.onDragHover(e,container),false);
+                container.removeEventListener('drop', e => this.onDragDrop(e),false);
+                container.removeEventListener('dragleave',e => this.onDragLeave(e),false);
+                container.removeEventListener('dragenter',e => this.onDragEnter(e),false);
+            });
+        }else if(name === 'draggables' && this.draggables){
+            this.draggables.forEach(draggable => {
+                draggable.removeEventListener('dragstart',e => this.onDragStart(e,draggable),false);
+                draggable.removeEventListener('dragend', e => this.onDragEnd(e,draggable),false);
+            });
+        }else if(this.draggables && this.containers){
+            this.containers.forEach(container => {
+                container.removeEventListener('dragover',e => this.onDragHover(e,container),false);
+                container.removeEventListener('drop',e => this.onDragDrop(e),false);
+                container.removeEventListener('dragleave',e => this.onDragLeave(e),false);
+                container.removeEventListener('dragenter',e => this.onDragEnter(e),false);
+            });
+            this.draggables.forEach(draggable => {
+                draggable.removeEventListener('dragstart',e => this.onDragStart(e),false);
+                draggable.removeEventListener('dragend',e => this.onDragEnd(e),false);
+            });
+        }
+    }
+    this.createPlaceHolder = function(){
+        let placeholder = document.createElement('div');
+        placeholder.style.height = '50px';
+        placeholder.style.borderRadius = '5px';
+        placeholder.style.backgroundColor = '#eee';
+        placeholder.style.margin = '10px 0';
+        this.placeholder = placeholder;
+    }
+    this.getDragAfterElement = function(container, y){
     const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
-
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect()
         const offset = y - box.top - box.height / 2
@@ -120,3 +100,134 @@ let addsec = document.getElementById('addsection');
         }
     }, { offset: Number.NEGATIVE_INFINITY }).element
     }
+
+    this.onDragStart = function(e,draggable){
+        e.stopPropagation();
+        let elementToInsert;
+        console.log("drag start",draggable);
+        // e.dataTransfer.setData('elementid',e.target.id);
+        if(draggable && draggable.getAttribute('name')){
+            let element = draggable.getAttribute('name');
+            
+            switch(element){
+                case 'text-field':
+                    elementToInsert = document.createElement('input');
+                    elementToInsert.classList.add('draggable');
+                    elementToInsert.setAttribute('draggable',true);
+                    elementToInsert.setAttribute('placeholder','Text');
+                    elementToInsert.setAttribute('disabled',true);
+                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                    this.elementToInsert = elementToInsert;
+                    this.existingElement = false;
+                    break;
+                case 'email-field':
+                        elementToInsert = document.createElement('input');
+                        elementToInsert.classList.add('draggable');
+                        elementToInsert.setAttribute('draggable',true);
+                        elementToInsert.setAttribute('placeholder','Email');
+                        elementToInsert.setAttribute('disabled',true);
+                        elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                        this.elementToInsert = elementToInsert;
+                        this.existingElement = false;
+                        break;
+                case 'phone-field':
+                    elementToInsert = document.createElement('input');
+                    
+                    elementToInsert.classList.add('draggable');
+                    elementToInsert.setAttribute('draggable',true);
+                    elementToInsert.setAttribute('placeholder','Phone');
+                    elementToInsert.setAttribute('disabled',true);
+                    elementToInsert.setAttribute('id',`field-${Date.now()}`);
+                    this.elementToInsert = elementToInsert;
+                    this.existingElement = false;
+                    break;
+                default:
+                    this.elementToInsert = draggable;
+                    this.existingElement = true;
+                    break;
+            }
+        }else{
+            this.existingElement = true;
+            this.elementToInsert = draggable; 
+        }
+        this.placeholder.setAttribute("id",`placeholder-${Date.now()}`);
+        draggable.classList.add('dragging');
+    }
+    this.onDragEnd = function(e,draggable){
+        draggable.classList.remove('dragging');
+        console.log("drag end",this.elementToInsert.id);
+        if(!this.existingElement){
+            this.addEventListenerForDraggableItem(this.elementToInsert);
+            this.updateDraggables('draggables');
+        }else{
+            console.log("existing ele",this.elementToInsert);
+            this.elementToInsert.classList.remove('dragging');
+        }
+        console.log("placeholder",this.placeholder);
+        let placeholderEl = document.getElementById(this.placeholder.id);
+        if(placeholderEl != null){
+            placeholderEl.parentElement.removeChild(placeholderEl);
+        }
+    }
+    this.addEventListenerForDraggableItem = function(element){
+        console.log("ele",element);
+        element.addEventListener('dragstart',e => this.onDragStart(e,element));
+        element.addEventListener('dragend',e => this.onDragEnd(e,element));
+    }
+
+    this.addEventListenersForContainer = function(container){
+        container.addEventListener('dragover',e => this.onDragHover(e,container,false));
+        container.addEventListener('drop',e => this.onDragDrop(e,container),false);
+        container.addEventListener('dragleave',e => this.onDragLeave(e,container),false);
+        container.addEventListener('dragenter',e => this.onDragEnter(e,container),false);
+    }
+
+    this.onDragHover = function(e,container){
+        e.preventDefault();
+        // this.afterElement = this.getDragAfterElement(container, e.clientY);
+        // if (this.afterElement == null) {
+        //     container.appendChild(this.placeholder)
+        // } else {
+        //     container.insertBefore(this.placeholder, this.afterElement)
+        // }
+    }
+    this.onDragEnter = function(e,container){
+        e.preventDefault();
+        console.log("on drag enter");
+        this.afterElement = this.getDragAfterElement(container, e.clientY);
+        let ele = document.getElementById(this.elementToInsert.id);
+        if(ele){
+            ele.parentElement.removeChild(ele);
+        }
+        if (this.afterElement == null) {
+            container.appendChild(this.placeholder)
+        } else {
+            container.insertBefore(this.placeholder, this.afterElement)
+        }
+
+    }
+    this.onDragLeave = function(e){
+        e.preventDefault();
+    }
+    
+    this.onDragDrop = function(e){
+        e.preventDefault()
+        // let data = e.dataTransfer.getData("elementid");
+        this.placeholder.replaceWith(this.elementToInsert);
+    }
+
+    this.init = function(){
+        try{
+            this.mainContainer = document.getElementById('main-container');
+            this.updateContainers();
+            this.updateDraggables();
+            this.addEventListeners();
+            this.createPlaceHolder();
+        }catch(e){
+            console.log(e);
+        }
+    }
+}
+
+let customDragnDrop = new CustomDragAndDrop();
+customDragnDrop.init();
