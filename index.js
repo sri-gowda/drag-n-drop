@@ -229,5 +229,18 @@ function CustomDragAndDrop(){
     }
 }
 
-let customDragnDrop = new CustomDragAndDrop();
-customDragnDrop.init();
+let customDragnDrop;
+
+window.addEventListener('load', (event) => {
+    console.log('page is fully loaded');
+    customDragnDrop = new CustomDragAndDrop();
+    customDragnDrop.init();
+});
+
+window.addEventListener('beforeunload', function(event) {
+    console.log('Before unloading the page');
+    customDragnDrop.removeEventListeners();
+    delete customDragnDrop;
+});
+
+
